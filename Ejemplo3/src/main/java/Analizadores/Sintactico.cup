@@ -1,0 +1,96 @@
+/* 1. Package e importaciones */
+package Analizadores; 
+
+import java_cup.runtime.*;
+import java.util.ArrayList;
+import java.util.List;
+import Errores.Excepcion;
+
+/* 2. Codigo para el parser, variables, metodos */
+parser code 
+{:
+    //Clases, objetos, variables, lista, etc... en sintaxis java
+    //Creo una lista de tipo String llamada 'resultados', donde guardare cada uno de los resultados analizados
+    
+    public List<String> resultados = new ArrayList<String>();
+    
+    //Lista de erros
+    public ArrayList<Excepcion> Errores = new ArrayList();
+
+    /**
+     * Método al que se llama automáticamente ante algún error sintactico.
+     **/ 
+    public void syntax_error(Symbol s){ 
+        Errores.add(new Excepcion("Sintáctico", "Error de sintaxis detectado. Se detectó: " + s.value, s.left + "", s.right + ""));
+    } 
+    
+    /**
+     * Método al que se llama automáticamente ante algún error sintáctico 
+     * en el que ya no es posible una recuperación de errores.
+     **/ 
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+        System.out.println("Error síntactico irrecuperable en la Línea " + (s.left)+ " Columna "+s.right+". Componente " + s.value + " no reconocido."); 
+    }
+
+    public ArrayList<Excepcion> getErrores(){
+        return Errores;
+    }
+
+:} 
+
+/* 3. Terminales */
+terminal String PTCOMA,PARIZQ,PARDER,CORIZQ,CORDER,LLAVDER,LLAVIZQ;
+terminal String MAS,MENOS,POR,DIVIDIDO;
+terminal String ENTERO;
+terminal String DECIMAL;
+terminal String UMENOS;
+terminal String PR_CALCULAR;
+
+/* 4. No Terminales */
+non terminal ini;
+non terminal instrucciones;
+non terminal instruccion;
+non terminal Double expresion;
+
+/* 5. Precedencias */
+precedence left MAS,MENOS;
+precedence left POR,DIVIDIDO;
+precedence right UMENOS; 
+
+/* 6. Producciones */
+
+start with ini; 
+ini::= LLAVIZQ instrucciones LLAVDER;
+
+instrucciones ::= instrucciones instruccion 
+                  | instrucciones error
+                  | instruccion
+; 
+
+
+
+instruccion ::= 
+   PR_CALCULAR CORIZQ expresion:a CORDER PTCOMA
+    {:
+    
+        System.out.println("El valor de la expresión es: "+a);
+    
+        //Inserto en la lista el resultado de la expresión evaluada
+        resultados.add("El valor de la expresión es: "+a);
+    :}
+    | error PTCOMA {:
+        //Aqui activa el Panic Mode al encontrar un punto y coma y reporta el error sintactico
+    :}
+;
+
+expresion  ::= 
+    MENOS expresion:a                      {: RESULT=a*-1; :}%prec UMENOS     
+ |  expresion:a MAS        expresion:b     {:RESULT=a+b;:}
+ |  expresion:a MENOS      expresion:b     {:RESULT=a-b;:}
+ |  expresion:a POR        expresion:b     {:RESULT=a*b;:}
+ |  expresion:a DIVIDIDO   expresion:b     {:RESULT=a/b;:}
+ |  ENTERO:a                               {:RESULT=new Double(a);:}
+ |  DECIMAL:a                              {:RESULT=new Double(a);:}
+ |  PARIZQ expresion:a PARDER              {:RESULT=a;:}
+;
+
