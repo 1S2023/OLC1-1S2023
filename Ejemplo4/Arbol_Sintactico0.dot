@@ -1,0 +1,20 @@
+Digraph Arbol_Sintactico{
+
+node0[label = "*"];
+node0 -> node00
+node00[label = "."];
+node00 -> node000
+node000[label = "letra"];
+node00 -> node001
+node001[label = "|"];
+node001 -> node0010
+node0010[label = "|"];
+node0010 -> node00100
+node00100[label = "letra"];
+node0010 -> node00101
+node00101[label = "num"];
+node001 -> node0011
+node0011[label = "_"];
+
+
+}

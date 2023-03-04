@@ -1,0 +1,14 @@
+Digraph Arbol_Sintactico{
+
+node0[label = "."];
+node0 -> node00
+node00[label = "."];
+node00 -> node000
+node000[label = "si"];
+node00 -> node001
+node001[label = "sale"];
+node0 -> node01
+node01[label = "compi"];
+
+
+}

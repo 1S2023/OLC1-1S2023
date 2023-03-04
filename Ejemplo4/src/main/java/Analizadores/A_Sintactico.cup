@@ -1,0 +1,110 @@
+
+/*--------------- 1ra Area: Codigo de Usuario -----------------------*/
+//-------> importaciones, paquetes
+package Analizadores;
+import java_cup.runtime.Symbol;
+
+import com.mycompany.ejemplo4.Nodo;
+import com.mycompany.ejemplo4.Expresiones;
+
+import com.mycompany.ejemplo4.Ventana;
+import com.mycompany.ejemplo4.error;
+import com.mycompany.ejemplo4.Arbol;
+
+import javax.swing.JOptionPane;
+import java.util.LinkedList;
+
+
+//------> Codigo para el parser,variables, metodos
+parser code{:
+        
+        public static Nodo raiz;
+        public static LinkedList<Expresiones> lista_er;
+        public int conthojas=0;
+
+        public void syntax_error(Symbol s)
+        {
+            System.err.println("Error en la Linea " + (s.right+1) +" Columna "+(s.left+1)+ ". Identificador "+s.value + " no reconocido. Se ha recuperado del error." );
+            error nuevo = new error("Error Sintactico (Recuperado)", s.value.toString(), s.right+1, s.left+1);
+            Ventana.listaErrores.add(nuevo);
+        }
+        public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
+        {
+            System.err.println("Error en la Linea " + (s.right+1)+ " Columna "+(s.left+1)+". Identificador " +s.value + " no reconocido.");
+            error nuevo = new error("Error Sintactico", s.value.toString(), s.right+1, s.left+1);
+            Ventana.listaErrores.add(nuevo);
+        }
+
+        public Nodo getRaiz(){
+            return raiz;
+        }
+:}
+
+//------> Codigo para las acciones gramaticales
+action code
+{:  :}
+
+/*--------------- 2da Area: Declaraciones -----------------------*/
+
+//------> declaracion de terminales 
+
+terminal String dobleporc, igual, por, pnt, pyc, or, para, parc, llavea, llavec, e_r, numero, letra, cadena, id, comilla, simple;
+
+//------> declaracion de no terminales
+non terminal LinkedList<Expresiones> INICIO, INSTRUCCIONES;
+
+non terminal Expresiones INSTRUCCION;
+
+non terminal Nodo ER;
+
+//------> precedencia de menor a mayor
+precedence left pnt;
+precedence left or;
+precedence left por;
+precedence left para;
+
+
+start with INICIO;
+
+/*--------------- 3ra Area: Reglas Semanticas -----------------------*/
+
+INICIO::= llavea:a INSTRUCCIONES:b  dobleporc:c  llavec:d {:  parser.lista_er = b; :}
+         | error;
+
+INSTRUCCIONES ::= INSTRUCCIONES:a INSTRUCCION:b  {: RESULT = a; RESULT.add(b); :}
+                | INSTRUCCION:a                  {: RESULT = new LinkedList<>(); RESULT.add(a); :}
+                ;
+
+INSTRUCCION::= e_r:a igual:b ER:c pyc:d
+            {: 
+             RESULT = new Expresiones(a.toString(), new Arbol(c)); 
+            :}
+            | error                          
+            ;
+
+ER::= ER:a or:b ER:c                {: RESULT=new Nodo("|", "", -1, a, c); :}
+    | ER:a pnt:b ER:c               {: RESULT=new Nodo(".", "", -1, a, c); :}
+    | ER:a por:b                    {: RESULT=new Nodo("*", "", -1, null, a); :}
+    | para:a ER:b parc:c            {: RESULT= b; :}
+    | ER:a para:b ER:c parc:d       {: RESULT=new Nodo(".", "", -1, a, c); :}
+    | id:a                         
+     {:
+         RESULT=new Nodo(a.toString(),"", parser.conthojas, null, null);
+         parser.conthojas++; 
+    :}
+    | cadena:a                     
+     {: 
+                RESULT=new Nodo(a.toString(), "", parser.conthojas, null, null);
+                parser.conthojas++; 
+    :}
+    ;
+
+
+
+ 
+
+
+
+
+
+

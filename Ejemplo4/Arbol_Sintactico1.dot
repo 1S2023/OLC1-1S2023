@@ -1,0 +1,8 @@
+Digraph Arbol_Sintactico{
+
+node0[label = "*"];
+node0 -> node00
+node00[label = "digito"];
+
+
+}
