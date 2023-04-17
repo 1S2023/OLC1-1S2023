@@ -1,0 +1,19 @@
+string cadena = "OLC1";
+
+println(cadena);
+
+cadena = "Hola mundo";
+
+prINTln(cadena);
+
+int numero = 5;
+string cadena2 = "Cadena global" + numero;
+
+println(cadena2);
+
+
+{
+    string cadena = "Cadena ambito local";
+    print(cadena);
+
+}
