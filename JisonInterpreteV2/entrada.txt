@@ -1,0 +1,13 @@
+string cadena ="hola";
+println(cadena);
+
+int [] vector_principal = new int[10];
+char [] vector_curso = ['o','l','c','1'];
+string[ ] vector2 = ["hola", "Mundo"];
+
+vector_principal[1] = 50;
+
+println(vector_principal);
+println(vector_curso);
+println(vector2);
+println(vector2[1]);
